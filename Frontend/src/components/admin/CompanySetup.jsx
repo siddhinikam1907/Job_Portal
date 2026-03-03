@@ -11,7 +11,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import { useSelector } from "react-redux";
 import { Loader2 } from "lucide-react";
-import useGetCompanyById from "@/hooks/useGetCompanyById";
+import useGetCompanyById from "@/hooks/UseGetCompanyById";
 
 function CompanySetup() {
   const [input, setInput] = useState({
