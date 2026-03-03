@@ -59,26 +59,32 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const { email, password, role } = req.body;
+
     if (!email || !password || !role) {
       return res.status(400).json({
         message: "All fields are required",
         success: false,
       });
     }
+
     let user = await User.findOne({ email: email.toLowerCase() });
+
     if (!user) {
       return res.status(400).json({
         message: "Invalid email or password",
         success: false,
       });
     }
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
+
     if (!isPasswordValid) {
       return res.status(400).json({
         message: "Invalid email or password",
         success: false,
       });
     }
+
     if (user.role !== role) {
       return res.status(400).json({
         message: "Account does not exist for the selected role",
@@ -86,14 +92,18 @@ export const login = async (req, res) => {
       });
     }
 
-    const tokenData = {
-      userId: user._id,
-      role: user.role,
-    };
-    const token = jwt.sign(tokenData, process.env.SECRET_KEY, {
-      expiresIn: "1d",
-    });
-    user = {
+    const token = jwt.sign(
+      {
+        userId: user._id,
+        role: user.role,
+      },
+      process.env.SECRET_KEY,
+      { expiresIn: "1d" },
+    );
+
+    const isProduction = process.env.NODE_ENV === "production";
+
+    const userResponse = {
       _id: user._id,
       fullname: user.fullname,
       email: user.email,
@@ -101,17 +111,18 @@ export const login = async (req, res) => {
       role: user.role,
       profile: user.profile,
     };
+
     return res
       .status(200)
       .cookie("token", token, {
         maxAge: 24 * 60 * 60 * 1000,
         httpOnly: true,
-        sameSite: "none",
-        secure: true,
+        secure: isProduction, // true only in production
+        sameSite: isProduction ? "none" : "lax", // fix cross-origin
       })
       .json({
         message: `${user.fullname} logged in successfully`,
-        user,
+        user: userResponse,
         success: true,
       });
   } catch (error) {
@@ -124,13 +135,15 @@ export const login = async (req, res) => {
 };
 export const logout = async (req, res) => {
   try {
+    const isProduction = process.env.NODE_ENV === "production";
+
     return res
       .status(200)
       .cookie("token", "", {
         maxAge: 0,
         httpOnly: true,
-        secure: true,
-        sameSite: "none",
+        secure: isProduction,
+        sameSite: isProduction ? "none" : "lax",
       })
       .json({
         message: "User logged out successfully",

@@ -7,44 +7,49 @@ import userRoutes from "./routes/user.route.js";
 import companyRoutes from "./routes/company.route.js";
 import jobRoutes from "./routes/job.route.js";
 import applicationRoutes from "./routes/application.route.js";
-dotenv.config({});
+
+dotenv.config();
 
 const app = express();
-/* app.get("/home", (req, res) => {
-  return res.status(200).json({
-    message: "Welcome to Job Portal Backend!",
-    success: true,
-  });
-}); */
 
-//MIDDLEWARE
+// ------------------- MIDDLEWARE -------------------
 
 app.use(express.json());
-//It allows your server to read incoming request bodies that are in JSON format.
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser()); //req.cookies
-const corsOptions = {
-  origin: [
-    "http://localhost:5173",
-    "https://job-portal-black-seven.vercel.app",
-  ],
-  credentials: true,
-};
+app.use(cookieParser());
 
-app.use(cors(corsOptions));
+// Allowed origins (Local + Production)
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://job-portal-f1nd-git-main-siddhinikam1907s-projects.vercel.app",
+  "https://job-portal-f1nd-3t8k842h5-siddhinikam1907s-projects.vercel.app",
+];
 
-/* Defines CORS options:
-origin → Only allow requests from http://localhost:5173 (your front-end server).
-credentials: true → Allow sending cookies or authentication headers along with requests.
- */
-app.use(cors(corsOptions));
+// Dynamic CORS handling
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  }),
+);
 
-//ROUTES
+// ------------------- ROUTES -------------------
+
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/companies", companyRoutes);
 app.use("/api/v1/jobs", jobRoutes);
 app.use("/api/v1/applications", applicationRoutes);
-const PORT = process.env.PORT || 3000;
+
+// ------------------- SERVER -------------------
+
+const PORT = process.env.PORT || 8000;
+
 app.listen(PORT, () => {
   connectDB();
   console.log(`Server is running on port ${PORT}`);
