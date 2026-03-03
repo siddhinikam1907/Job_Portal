@@ -24,9 +24,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser()); //req.cookies
 const corsOptions = {
-  origin: "http://localhost:5173",
+  origin: [
+    "http://localhost:5173",
+    "https://job-portal-black-seven.vercel.app",
+  ],
   credentials: true,
 };
+
+app.use(cors(corsOptions));
 
 /* Defines CORS options:
 origin → Only allow requests from http://localhost:5173 (your front-end server).
