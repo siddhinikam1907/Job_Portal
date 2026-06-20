@@ -50,14 +50,14 @@ function ApplicantsTable() {
         </TableHeader>
 
         <TableBody>
-          {applicants &&
+          {applicants?.applications?.length > 0 ? (
             applicants.applications.map((item) => (
               <TableRow key={item._id}>
                 <TableCell>{item?.applicant?.fullname}</TableCell>
                 <TableCell>{item?.applicant?.email}</TableCell>
                 <TableCell>{item?.applicant?.phoneNumber}</TableCell>
                 <TableCell>
-                  {item.applicant?.profile?.resume ? (
+                  {item?.applicant?.profile?.resume ? (
                     <a
                       className="text-blue-600 cursor-pointer"
                       target="_blank"
@@ -70,10 +70,7 @@ function ApplicantsTable() {
                     <span>NA</span>
                   )}
                 </TableCell>
-                <TableCell>
-                  {item?.applicant?.createdAt.split("T")[0]}
-                </TableCell>
-
+                <TableCell>{item?.createdAt?.split("T")[0]}</TableCell>
                 <TableCell className="text-right">
                   <Popover>
                     <PopoverTrigger asChild>
@@ -81,12 +78,11 @@ function ApplicantsTable() {
                         <MoreHorizontal className="cursor-pointer" />
                       </button>
                     </PopoverTrigger>
-
                     <PopoverContent className="w-32">
                       {shortListingStatus.map((status, index) => (
                         <div
-                          onClick={() => statusHandler(status, item?._id)}
                           key={index}
+                          onClick={() => statusHandler(status, item?._id)}
                           className="cursor-pointer hover:bg-gray-100 p-2 rounded"
                         >
                           {status}
@@ -96,7 +92,14 @@ function ApplicantsTable() {
                   </Popover>
                 </TableCell>
               </TableRow>
-            ))}
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={6} className="text-center">
+                No Applicants Found
+              </TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </Table>
     </div>

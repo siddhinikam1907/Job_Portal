@@ -9,6 +9,7 @@ import { USER_API_END_POINT } from "@/utils/constant.js";
 import { toast } from "sonner";
 import axios from "axios";
 import { setUser } from "@/redux/authSlice.js";
+import { clearJobState } from "@/redux/jobSlice.js";
 
 function Navbar() {
   const { user } = useSelector((store) => store.auth);
@@ -20,8 +21,10 @@ function Navbar() {
       const res = await axios.get(`${USER_API_END_POINT}/logout`, {
         withCredentials: true,
       });
+
       if (res.data.success) {
         dispatch(setUser(null));
+        dispatch(clearJobState()); // ⭐ clear previous jobs
         navigate("/");
         toast.success(res.data.message);
       }
@@ -30,6 +33,7 @@ function Navbar() {
       toast.error(error.response.data.message);
     }
   };
+
   return (
     <div className="bg-white">
       <div className="flex items-center justify-between mx-auto max-w-7xl h-16">
