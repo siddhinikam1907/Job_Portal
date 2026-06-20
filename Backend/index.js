@@ -24,15 +24,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser()); //req.cookies
 const corsOptions = {
-  origin: "http://localhost:5173",
+  origin: process.env.FRONTEND_URL || "http://localhost:5173",
   credentials: true,
 };
+
+app.use(cors(corsOptions));
 
 /* Defines CORS options:
 origin → Only allow requests from http://localhost:5173 (your front-end server).
 credentials: true → Allow sending cookies or authentication headers along with requests.
  */
-app.use(cors(corsOptions));
 
 //ROUTES
 app.use("/api/v1/users", userRoutes);
